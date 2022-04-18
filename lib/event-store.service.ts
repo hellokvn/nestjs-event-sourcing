@@ -6,8 +6,10 @@ import { BaseEvent } from './events/base.event';
 
 @Injectable()
 export class EventStoreService {
-  @InjectModel(EventModel.name)
-  private EventModel: Model<EventModelDocument>;
+  constructor(
+    @InjectModel(EventModel.name)
+    private eventModel: Model<EventModelDocument>,
+  ) {}
 
   public async saveEvents(aggregateId: string, events: BaseEvent[], expectedVersion: number, type: string): Promise<void> {
     console.log('AccountEventStore/saveEvents');
@@ -47,7 +49,7 @@ export class EventStoreService {
     const eventStream: EventModel[] = await this.findByAggregateIdentifier(aggregateId);
 
     if (!eventStream || !eventStream.length) {
-      throw new HttpException('Incorrect account ID provided!', null);
+      throw new HttpException('Incorrect account ID provided!', 500);
     }
 
     return eventStream.map((aggregate: EventModel) => {
@@ -59,12 +61,12 @@ export class EventStoreService {
   }
 
   public save(payload: any): Promise<EventModel> {
-    const model = new this.EventModel(payload);
+    const model = new this.eventModel(payload);
 
     return model.save();
   }
 
   public findByAggregateIdentifier(aggregateIdentifier: string): Promise<EventModel[]> {
-    return this.EventModel.find({ aggregateIdentifier }).exec();
+    return this.eventModel.find({ aggregateIdentifier }).exec();
   }
 }

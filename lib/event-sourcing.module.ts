@@ -6,12 +6,12 @@ import { EventModel, EventModelSchema } from './schemas/event-store.schema';
 
 @Module({})
 export class EventSourcingModule {
-  static forRoot(options?: EventSourcingOptions): DynamicModule {
+  static forRoot(opts: EventSourcingOptions): DynamicModule {
     return {
       global: true,
       module: EventSourcingModule,
       imports: [
-        MongooseModule.forRoot(options.mongoUrl),
+        MongooseModule.forRoot(opts.mongoUrl),
         MongooseModule.forFeature([{ name: EventModel.name, schema: EventModelSchema }]),
       ],
       providers: [EventStoreService],

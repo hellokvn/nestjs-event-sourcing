@@ -6,8 +6,10 @@ import { ExtendedAggregateRoot } from './aggregator/extended.aggregator';
 
 @Injectable()
 export class EventSourcingHandler<T extends ExtendedAggregateRoot> implements IEventSourcingHandler<T> {
-  @Inject(EventStoreService)
-  private eventStoreService: EventStoreService;
+  constructor(
+    @Inject(EventStoreService)
+    private eventStoreService: EventStoreService,
+  ) {}
 
   public async save(aggregate: T): Promise<void> {
     console.log('AccountEventSourcingHandler/save');
