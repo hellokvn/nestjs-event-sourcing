@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventStoreService = void 0;
 const mongoose_1 = require("mongoose");
@@ -15,6 +18,9 @@ const common_1 = require("@nestjs/common");
 const mongoose_2 = require("@nestjs/mongoose");
 const event_store_schema_1 = require("./schemas/event-store.schema");
 let EventStoreService = class EventStoreService {
+    constructor(eventModel) {
+        this.eventModel = eventModel;
+    }
     async saveEvents(aggregate) {
         const events = aggregate.getUncommittedEvents();
         console.log('AccountEventStore/saveEvents');
@@ -58,12 +64,10 @@ let EventStoreService = class EventStoreService {
         return this.eventModel.find({ aggregateIdentifier }).exec();
     }
 };
-__decorate([
-    (0, mongoose_2.InjectModel)(event_store_schema_1.EventModel.name),
-    __metadata("design:type", mongoose_1.Model)
-], EventStoreService.prototype, "eventModel", void 0);
 EventStoreService = __decorate([
-    (0, common_1.Injectable)()
+    (0, common_1.Injectable)(),
+    __param(0, (0, mongoose_2.InjectModel)(event_store_schema_1.EventModel.name)),
+    __metadata("design:paramtypes", [mongoose_1.Model])
 ], EventStoreService);
 exports.EventStoreService = EventStoreService;
 //# sourceMappingURL=event-store.service.js.map
