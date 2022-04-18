@@ -1,20 +1,9 @@
-# source
-lib
-tests
-index.ts
-package-lock.json
 tslint.json
-tsconfig.json
-.prettierrc
-.commitlintrc.json
-.eslintignore
 .eslintrc.js
-
-# github
-.github
-CONTRIBUTING.md
-renovate.json
-.release-it.json
-
-# ci
-.circleci
+.eslintignore
+yarn-error.log
+docs
+example
+nest-cli.json
+tsconfig*.json
+.prettierrc

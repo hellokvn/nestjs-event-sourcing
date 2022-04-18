@@ -24,7 +24,8 @@ let EventStoreService = class EventStoreService {
     async saveEvents(aggregateId, events, expectedVersion, type) {
         console.log('AccountEventStore/saveEvents');
         const eventStream = await this.findByAggregateIdentifier(aggregateId);
-        if (expectedVersion != -1 && eventStream[eventStream.length - 1].version !== expectedVersion) {
+        if (expectedVersion != -1 &&
+            eventStream[eventStream.length - 1].version !== expectedVersion) {
             console.log('--- ERR --- ConcurrencyException');
         }
         let version = expectedVersion;

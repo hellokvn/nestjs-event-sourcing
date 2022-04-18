@@ -5,7 +5,9 @@ import { IEventSourcingHandler } from './handlers/event-sourcing.handler';
 import { ExtendedAggregateRoot } from './aggregator/extended.aggregator';
 
 @Injectable()
-export class EventSourcingHandler<T extends ExtendedAggregateRoot> implements IEventSourcingHandler<T> {
+export class EventSourcingHandler<T extends ExtendedAggregateRoot>
+  implements IEventSourcingHandler<T>
+{
   constructor(
     @Inject(EventStoreService)
     private eventStoreService: EventStoreService,
@@ -13,7 +15,12 @@ export class EventSourcingHandler<T extends ExtendedAggregateRoot> implements IE
 
   public async save(aggregate: T): Promise<void> {
     console.log('AccountEventSourcingHandler/save');
-    await this.eventStoreService.saveEvents(aggregate.id, aggregate.getUncommittedEvents(), aggregate.version, aggregate.type);
+    await this.eventStoreService.saveEvents(
+      aggregate.id,
+      aggregate.getUncommittedEvents(),
+      aggregate.version,
+      aggregate.type,
+    );
 
     // aggregate.markChangesAsCommitted();
   }

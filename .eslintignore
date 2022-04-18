@@ -1,3 +1,6 @@
-src/**/*.test.ts
-src/**/files/**
-test/**
+node_modules
+.vscode
+build
+public/bundle.js
+.history
+docker/

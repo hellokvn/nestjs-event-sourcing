@@ -1,1 +1,1 @@
-{"version":3,"file":"event-store.interface.js","sourceRoot":"","sources":["../../lib/infrastructure/event-store.interface.ts"],"names":[],"mappings":""}
+{"version":3,"file":"event-store.interface.js","sourceRoot":"","sources":["../../src/infrastructure/event-store.interface.ts"],"names":[],"mappings":""}
