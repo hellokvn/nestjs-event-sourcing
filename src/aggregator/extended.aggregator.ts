@@ -12,5 +12,6 @@ export class ExtendedAggregateRoot extends AggregateRoot<BaseEvent> {
     super();
 
     this.version = -1;
+    this.type = this.constructor.name;
   }
 }

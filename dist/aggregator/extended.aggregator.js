@@ -6,6 +6,7 @@ class ExtendedAggregateRoot extends cqrs_1.AggregateRoot {
     constructor() {
         super();
         this.version = -1;
+        this.type = this.constructor.name;
     }
 }
 exports.ExtendedAggregateRoot = ExtendedAggregateRoot;
