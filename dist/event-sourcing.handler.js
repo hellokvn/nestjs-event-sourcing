@@ -17,8 +17,9 @@ let EventSourcingHandler = class EventSourcingHandler {
         console.log('AccountEventSourcingHandler/save');
         await this.eventStoreService.saveEvents(aggregate);
     }
-    async getById(aggregate, id) {
+    async getById(aggregateClass, id) {
         console.log('AccountEventSourcingHandler/getById');
+        const aggregate = new aggregateClass();
         const events = await this.eventStoreService.getEvents(id);
         if (events && events.length) {
             aggregate.loadFromHistory(events);

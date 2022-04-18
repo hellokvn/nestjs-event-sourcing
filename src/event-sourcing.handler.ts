@@ -3,6 +3,7 @@ import { EventStoreService } from './event-store.service';
 import { BaseEvent } from './events/base.event';
 import { IEventSourcingHandler } from './handlers/event-sourcing.handler';
 import { ExtendedAggregateRoot } from './aggregator/extended.aggregator';
+import { Type } from './helpers/utils.helper';
 
 @Injectable()
 export class EventSourcingHandler<T extends ExtendedAggregateRoot> implements IEventSourcingHandler<T> {
@@ -16,8 +17,9 @@ export class EventSourcingHandler<T extends ExtendedAggregateRoot> implements IE
     // aggregate.markChangesAsCommitted();
   }
 
-  public async getById(aggregate: T, id: string): Promise<any> {
+  public async getById(aggregateClass: Type<T>, id: string): Promise<T> {
     console.log('AccountEventSourcingHandler/getById');
+    const aggregate: T = new aggregateClass();
     const events: BaseEvent[] = await this.eventStoreService.getEvents(id);
 
     if (events && events.length) {
