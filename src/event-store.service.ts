@@ -3,34 +3,24 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { EventModel, EventModelDocument } from './schemas/event-store.schema';
 import { BaseEvent } from './events/base.event';
+import { ExtendedAggregateRoot } from './aggregator/extended.aggregator';
 
 @Injectable()
-export class EventStoreService {
-  constructor(
-    @InjectModel(EventModel.name)
-    private eventModel: Model<EventModelDocument>,
-  ) {}
+export class EventStoreService<T extends ExtendedAggregateRoot> {
+  @InjectModel(EventModel.name)
+  private eventModel: Model<EventModelDocument>;
 
-  public async saveEvents(
-    aggregateId: string,
-    events: BaseEvent[],
-    expectedVersion: number,
-    type: string,
-  ): Promise<void> {
+  public async saveEvents(aggregate: T): Promise<void> {
+    const events: BaseEvent[] = aggregate.getUncommittedEvents();
     console.log('AccountEventStore/saveEvents');
-    const eventStream: EventModel[] = await this.findByAggregateIdentifier(
-      aggregateId,
-    );
+    const eventStream: EventModel[] = await this.findByAggregateIdentifier(aggregate.id);
 
     // optimistic concurrency check
-    if (
-      expectedVersion != -1 &&
-      eventStream[eventStream.length - 1].version !== expectedVersion
-    ) {
+    if (aggregate.version != -1 && eventStream[eventStream.length - 1].version !== aggregate.version) {
       console.log('--- ERR --- ConcurrencyException');
     }
 
-    let version: number = expectedVersion;
+    let version: number = aggregate.version;
 
     events.forEach(async (event: BaseEvent) => {
       const { constructor }: any = Object.getPrototypeOf(event);
@@ -39,8 +29,8 @@ export class EventStoreService {
       event.version = version;
 
       const eventModel: EventModel = new EventModel();
-      eventModel.aggregateIdentifier = aggregateId;
-      eventModel.aggregateType = type;
+      eventModel.aggregateIdentifier = aggregate.id;
+      eventModel.aggregateType = aggregate.type;
       eventModel.eventType = constructor.name;
       eventModel.version = version;
       eventModel.eventData = event;
@@ -56,9 +46,7 @@ export class EventStoreService {
 
   public async getEvents(aggregateId: string): Promise<BaseEvent[] | never> {
     console.log('AccountEventStore/getEvents', aggregateId);
-    const eventStream: EventModel[] = await this.findByAggregateIdentifier(
-      aggregateId,
-    );
+    const eventStream: EventModel[] = await this.findByAggregateIdentifier(aggregateId);
 
     if (!eventStream || !eventStream.length) {
       throw new HttpException('Incorrect account ID provided!', 500);
@@ -66,10 +54,7 @@ export class EventStoreService {
 
     return eventStream.map((aggregate: EventModel) => {
       (aggregate.eventData as any).constructor = { name: aggregate.eventType };
-      aggregate.eventData = Object.assign(
-        Object.create(aggregate.eventData),
-        aggregate.eventData,
-      );
+      aggregate.eventData = Object.assign(Object.create(aggregate.eventData), aggregate.eventData);
 
       return aggregate.eventData;
     });
@@ -81,9 +66,7 @@ export class EventStoreService {
     return model.save();
   }
 
-  public findByAggregateIdentifier(
-    aggregateIdentifier: string,
-  ): Promise<EventModel[]> {
+  public findByAggregateIdentifier(aggregateIdentifier: string): Promise<EventModel[]> {
     return this.eventModel.find({ aggregateIdentifier }).exec();
   }
 }

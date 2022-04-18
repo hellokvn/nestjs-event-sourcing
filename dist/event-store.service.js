@@ -8,9 +8,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventStoreService = void 0;
 const mongoose_1 = require("mongoose");
@@ -18,25 +15,22 @@ const common_1 = require("@nestjs/common");
 const mongoose_2 = require("@nestjs/mongoose");
 const event_store_schema_1 = require("./schemas/event-store.schema");
 let EventStoreService = class EventStoreService {
-    constructor(eventModel) {
-        this.eventModel = eventModel;
-    }
-    async saveEvents(aggregateId, events, expectedVersion, type) {
+    async saveEvents(aggregate) {
+        const events = aggregate.getUncommittedEvents();
         console.log('AccountEventStore/saveEvents');
-        const eventStream = await this.findByAggregateIdentifier(aggregateId);
-        if (expectedVersion != -1 &&
-            eventStream[eventStream.length - 1].version !== expectedVersion) {
+        const eventStream = await this.findByAggregateIdentifier(aggregate.id);
+        if (aggregate.version != -1 && eventStream[eventStream.length - 1].version !== aggregate.version) {
             console.log('--- ERR --- ConcurrencyException');
         }
-        let version = expectedVersion;
+        let version = aggregate.version;
         events.forEach(async (event) => {
             const { constructor } = Object.getPrototypeOf(event);
             console.log('event', constructor.name);
             version++;
             event.version = version;
             const eventModel = new event_store_schema_1.EventModel();
-            eventModel.aggregateIdentifier = aggregateId;
-            eventModel.aggregateType = type;
+            eventModel.aggregateIdentifier = aggregate.id;
+            eventModel.aggregateType = aggregate.type;
             eventModel.eventType = constructor.name;
             eventModel.version = version;
             eventModel.eventData = event;
@@ -64,10 +58,12 @@ let EventStoreService = class EventStoreService {
         return this.eventModel.find({ aggregateIdentifier }).exec();
     }
 };
+__decorate([
+    (0, mongoose_2.InjectModel)(event_store_schema_1.EventModel.name),
+    __metadata("design:type", mongoose_1.Model)
+], EventStoreService.prototype, "eventModel", void 0);
 EventStoreService = __decorate([
-    (0, common_1.Injectable)(),
-    __param(0, (0, mongoose_2.InjectModel)(event_store_schema_1.EventModel.name)),
-    __metadata("design:paramtypes", [mongoose_1.Model])
+    (0, common_1.Injectable)()
 ], EventStoreService);
 exports.EventStoreService = EventStoreService;
 //# sourceMappingURL=event-store.service.js.map

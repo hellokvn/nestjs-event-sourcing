@@ -19,9 +19,7 @@ let EventSourcingModule = EventSourcingModule_1 = class EventSourcingModule {
             module: EventSourcingModule_1,
             imports: [
                 mongoose_1.MongooseModule.forRoot(opts.mongoUrl),
-                mongoose_1.MongooseModule.forFeature([
-                    { name: event_store_schema_1.EventModel.name, schema: event_store_schema_1.EventModelSchema },
-                ]),
+                mongoose_1.MongooseModule.forFeature([{ name: event_store_schema_1.EventModel.name, schema: event_store_schema_1.EventModelSchema }]),
             ],
             providers: [event_store_service_1.EventStoreService],
             exports: [event_store_service_1.EventStoreService],

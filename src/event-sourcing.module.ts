@@ -12,9 +12,7 @@ export class EventSourcingModule {
       module: EventSourcingModule,
       imports: [
         MongooseModule.forRoot(opts.mongoUrl),
-        MongooseModule.forFeature([
-          { name: EventModel.name, schema: EventModelSchema },
-        ]),
+        MongooseModule.forFeature([{ name: EventModel.name, schema: EventModelSchema }]),
       ],
       providers: [EventStoreService],
       exports: [EventStoreService],
