@@ -15,6 +15,18 @@ const event_store_schema_1 = require("./schemas/event-store.schema");
 let EventSourcingModule = EventSourcingModule_1 = class EventSourcingModule {
     static forRoot(opts) {
         return {
+            imports: [
+                mongoose_1.MongooseModule.forRoot(opts.mongoUrl),
+                mongoose_1.MongooseModule.forFeature([{ name: event_store_schema_1.EventModel.name, schema: event_store_schema_1.EventModelSchema }]),
+            ],
+            global: true,
+            module: EventSourcingModule_1,
+            providers: [event_store_service_1.EventStoreService],
+            exports: [event_store_service_1.EventStoreService],
+        };
+    }
+    static forRootAsync(opts) {
+        return {
             global: true,
             module: EventSourcingModule_1,
             imports: [
