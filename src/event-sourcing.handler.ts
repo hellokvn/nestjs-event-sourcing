@@ -22,6 +22,10 @@ export class EventSourcingHandler<T extends ExtendedAggregateRoot> implements IE
     const aggregate: T = new aggregateClass();
     const events: BaseEvent[] = await this.eventStoreService.getEvents(id);
 
+    if (!events || !events.length) {
+      return aggregate;
+    }
+
     if (events && events.length) {
       aggregate.loadFromHistory(events);
 

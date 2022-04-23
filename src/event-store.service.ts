@@ -47,11 +47,11 @@ export class EventStoreService<T extends ExtendedAggregateRoot> {
   }
 
   public async getEvents(aggregateId: string): Promise<BaseEvent[] | never> {
-    console.log('AccountEventStore/getEvents', aggregateId);
     const eventStream: EventModel[] = await this.findByAggregateIdentifier(aggregateId);
 
     if (!eventStream || !eventStream.length) {
-      throw new HttpException('Incorrect account ID provided!', 500);
+      return;
+      // throw new HttpException('Incorrect account ID provided!', 500);
     }
 
     return eventStream.map((aggregate: EventModel) => {
