@@ -26,7 +26,7 @@ export class EventStoreService<T extends ExtendedAggregateRoot> {
 
     events.forEach(async (event: BaseEvent) => {
       const { constructor }: any = Object.getPrototypeOf(event);
-      console.log('event', constructor.name);
+
       version++;
       event.version = version;
 

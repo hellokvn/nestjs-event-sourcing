@@ -13,14 +13,12 @@ export class EventSourcingHandler<T extends ExtendedAggregateRoot> implements IE
   ) {}
 
   public async save(aggregate: T): Promise<void> {
-    console.log('AccountEventSourcingHandler/save');
     await this.eventStoreService.saveEvents(aggregate);
 
     // aggregate.markChangesAsCommitted();
   }
 
   public async getById(aggregateClass: Type<T>, id: string): Promise<T> {
-    console.log('AccountEventSourcingHandler/getById');
     const aggregate: T = new aggregateClass();
     const events: BaseEvent[] = await this.eventStoreService.getEvents(id);
 
