@@ -7,10 +7,8 @@ import { ExtendedAggregateRoot } from './aggregator/extended.aggregator';
 
 @Injectable()
 export class EventStoreService<T extends ExtendedAggregateRoot> {
-  constructor(
-    @InjectModel(EventModel.name)
-    private eventModel: Model<EventModelDocument>,
-  ) {}
+  @InjectModel(EventModel.name)
+  private eventModel: Model<EventModelDocument>;
 
   public async saveEvents(aggregate: T): Promise<void> {
     const events: BaseEvent[] = aggregate.getUncommittedEvents();
