@@ -1,8 +1,9 @@
 {
-  "name": "nest-event-sourcing",
+  "name": "nestjs-event-sourcing",
   "version": "1.0.0",
-  "description": "",
+  "description": "Support of Event Sourcing based on MongoDB for NestJS",
   "author": "Kevin Vogel <hellokevinvogel@gmail.com>",
+  "url": "https://github.com/hellokvn/nestjs-event-sourcing#readme",
   "license": "MIT",
   "main": "dist/index.js",
   "files": [
@@ -30,10 +31,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/hellokvn/nest-event-sourcing"
+    "url": "https://github.com/hellokvn/nestjs-event-sourcing"
   },
   "bugs": {
-    "url": "https://github.com/hellokvn/nest-event-sourcing"
+    "url": "https://github.com/hellokvn/nestjs-event-sourcing"
   },
   "resolutions": {
     "**/**/ky": ">=0.30.0",
@@ -93,5 +94,5 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   },
-  "homepage": "https://github.com/hellokvn/nest-event-sourcing#readme"
+  "homepage": "https://github.com/hellokvn/nestjs-event-sourcing#readme"
 }
