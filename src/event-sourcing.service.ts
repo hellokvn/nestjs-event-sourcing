@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import * as mongoDB from 'mongodb';
 
 import { EVENT_SOURCING_MODULE_OPTIONS } from './event-sourcing.constants';
@@ -8,20 +8,22 @@ import { BaseEvent } from './events/base.event';
 import { ExtendedAggregateRoot } from './aggregate/extended.aggregator';
 
 @Injectable()
-export class EventSourcingService<T extends ExtendedAggregateRoot> {
+export class EventSourcingService<T extends ExtendedAggregateRoot> implements OnModuleInit, OnModuleDestroy {
   private mongoClient: mongoDB.MongoClient;
   private eventStoreCollection: mongoDB.Collection<any>;
 
-  constructor(@Inject(EVENT_SOURCING_MODULE_OPTIONS) options: EventSourcingModuleOptions) {
-    this.init(options);
-  }
+  constructor(@Inject(EVENT_SOURCING_MODULE_OPTIONS) private readonly options: EventSourcingModuleOptions) {}
 
-  private async init(options: EventSourcingModuleOptions): Promise<void> {
-    this.mongoClient = new mongoDB.MongoClient(options.mongoUrl);
+  public async onModuleInit(): Promise<void> {
+    this.mongoClient = new mongoDB.MongoClient(this.options.mongoUrl);
 
     await this.mongoClient.connect();
 
     this.eventStoreCollection = this.mongoClient.db().collection('eventStore');
+  }
+
+  public onModuleDestroy(): void {
+    this.mongoClient.close();
   }
 
   private findByAggregateIdentifier(aggregateIdentifier: string): Promise<Event[]> {
