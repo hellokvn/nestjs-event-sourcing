@@ -1,44 +1,75 @@
-import { DynamicModule, Module, ModuleMetadata, Type } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { EventStoreService } from './event-store.service';
-import { EventSourcingOptions } from './eventsourcing.options';
-import { EventModel, EventModelSchema } from './schemas/event-store.schema';
+import { DynamicModule, Global, Module, Provider, Type } from '@nestjs/common';
 
-export interface EventSourcingModuleAsyncOptions extends Pick<ModuleMetadata, 'imports'> {
-  name?: string;
-  useExisting?: Type<any>;
-  useClass?: Type<any>;
-  useFactory?: (...args: any[]) => Promise<any> | any;
-  connectionFactory?: any;
-  inject?: any[];
-  mongoUrl: string;
-}
+import { EVENT_SOURCING_TOKEN, EVENT_SOURCING_MODULE_OPTIONS } from './event-sourcing.constants';
+import { EventSourcingHandler } from './event-sourcing.handler';
+import {
+  EventSourcingModuleOptions,
+  EventSourcingModuleAsyncOptions,
+  EventSourcingModuleFactory,
+} from './event-sourcing.interface';
+import { EventSourcingService } from './event-sourcing.service';
 
+const SERVICES: any[] = [EventSourcingService, EventSourcingHandler];
+
+@Global()
 @Module({})
 export class EventSourcingModule {
-  static forRoot(opts: EventSourcingOptions): DynamicModule {
+  public static forRoot(options: EventSourcingModuleOptions): DynamicModule {
+    // const provider: Provider = createEventSourcingProvider(options);
+
     return {
-      imports: [
-        MongooseModule.forRoot(opts.mongoUrl),
-        MongooseModule.forFeature([{ name: EventModel.name, schema: EventModelSchema }]),
-      ],
-      global: true,
       module: EventSourcingModule,
-      providers: [EventStoreService],
-      exports: [EventStoreService],
+      providers: [...SERVICES],
+      exports: [...SERVICES],
     };
   }
 
-  static forRootAsync(opts: EventSourcingModuleAsyncOptions): DynamicModule {
+  public static forRootAsync(options: EventSourcingModuleAsyncOptions): DynamicModule {
+    const provider: Provider = {
+      inject: [EVENT_SOURCING_MODULE_OPTIONS],
+      provide: EVENT_SOURCING_TOKEN,
+      useFactory: async (options: EventSourcingModuleOptions) => options,
+    };
+
     return {
-      global: true,
       module: EventSourcingModule,
-      imports: [
-        MongooseModule.forRoot(opts.mongoUrl),
-        MongooseModule.forFeature([{ name: EventModel.name, schema: EventModelSchema }]),
-      ],
-      providers: [EventStoreService],
-      exports: [EventStoreService],
+      imports: options.imports,
+      providers: [...this.createAsyncProviders(options), provider, ...SERVICES],
+      exports: [provider, ...SERVICES],
+    };
+  }
+
+  private static createAsyncProviders(options: EventSourcingModuleAsyncOptions): Provider[] {
+    if (options.useExisting || options.useFactory) {
+      return [this.createAsyncOptionsProvider(options)];
+    }
+
+    const useClass = options.useClass as Type<EventSourcingModuleFactory>;
+
+    return [
+      this.createAsyncOptionsProvider(options),
+      {
+        provide: useClass,
+        useClass,
+      },
+    ];
+  }
+
+  private static createAsyncOptionsProvider(options: EventSourcingModuleAsyncOptions): Provider {
+    if (options.useFactory) {
+      return {
+        provide: EVENT_SOURCING_MODULE_OPTIONS,
+        useFactory: options.useFactory,
+        inject: options.inject || [],
+      };
+    }
+
+    const inject = [(options.useClass || options.useExisting) as Type<EventSourcingModuleFactory>];
+
+    return {
+      provide: EVENT_SOURCING_MODULE_OPTIONS,
+      useFactory: async (optionsFactory: EventSourcingModuleFactory) => await optionsFactory.createEventSourcingModuleOptions(),
+      inject,
     };
   }
 }
