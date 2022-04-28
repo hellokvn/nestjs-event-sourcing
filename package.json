@@ -1,6 +1,6 @@
 {
   "name": "nestjs-event-sourcing",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Support of Event Sourcing based on MongoDB for NestJS",
   "author": "Kevin Vogel <hellokevinvogel@gmail.com>",
   "url": "https://github.com/hellokvn/nestjs-event-sourcing#readme",
