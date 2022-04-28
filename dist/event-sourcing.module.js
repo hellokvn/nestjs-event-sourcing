@@ -9,36 +9,62 @@ var EventSourcingModule_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventSourcingModule = void 0;
 const common_1 = require("@nestjs/common");
-const mongoose_1 = require("@nestjs/mongoose");
-const event_store_service_1 = require("./event-store.service");
-const event_store_schema_1 = require("./schemas/event-store.schema");
+const event_sourcing_constants_1 = require("./event-sourcing.constants");
+const event_sourcing_handler_1 = require("./event-sourcing.handler");
+const event_sourcing_service_1 = require("./event-sourcing.service");
+const SERVICES = [event_sourcing_service_1.EventSourcingService, event_sourcing_handler_1.EventSourcingHandler];
 let EventSourcingModule = EventSourcingModule_1 = class EventSourcingModule {
-    static forRoot(opts) {
+    static forRoot(options) {
         return {
-            imports: [
-                mongoose_1.MongooseModule.forRoot(opts.mongoUrl),
-                mongoose_1.MongooseModule.forFeature([{ name: event_store_schema_1.EventModel.name, schema: event_store_schema_1.EventModelSchema }]),
-            ],
-            global: true,
             module: EventSourcingModule_1,
-            providers: [event_store_service_1.EventStoreService],
-            exports: [event_store_service_1.EventStoreService],
+            providers: [...SERVICES],
+            exports: [...SERVICES],
         };
     }
-    static forRootAsync(opts) {
+    static forRootAsync(options) {
+        const provider = {
+            inject: [event_sourcing_constants_1.EVENT_SOURCING_MODULE_OPTIONS],
+            provide: event_sourcing_constants_1.EVENT_SOURCING_TOKEN,
+            useFactory: async (options) => options,
+        };
         return {
-            global: true,
             module: EventSourcingModule_1,
-            imports: [
-                mongoose_1.MongooseModule.forRoot(opts.mongoUrl),
-                mongoose_1.MongooseModule.forFeature([{ name: event_store_schema_1.EventModel.name, schema: event_store_schema_1.EventModelSchema }]),
-            ],
-            providers: [event_store_service_1.EventStoreService],
-            exports: [event_store_service_1.EventStoreService],
+            imports: options.imports,
+            providers: [...this.createAsyncProviders(options), provider, ...SERVICES],
+            exports: [provider, ...SERVICES],
+        };
+    }
+    static createAsyncProviders(options) {
+        if (options.useExisting || options.useFactory) {
+            return [this.createAsyncOptionsProvider(options)];
+        }
+        const useClass = options.useClass;
+        return [
+            this.createAsyncOptionsProvider(options),
+            {
+                provide: useClass,
+                useClass,
+            },
+        ];
+    }
+    static createAsyncOptionsProvider(options) {
+        if (options.useFactory) {
+            return {
+                provide: event_sourcing_constants_1.EVENT_SOURCING_MODULE_OPTIONS,
+                useFactory: options.useFactory,
+                inject: options.inject || [],
+            };
+        }
+        const inject = [(options.useClass || options.useExisting)];
+        return {
+            provide: event_sourcing_constants_1.EVENT_SOURCING_MODULE_OPTIONS,
+            useFactory: async (optionsFactory) => await optionsFactory.createEventSourcingModuleOptions(),
+            inject,
         };
     }
 };
 EventSourcingModule = EventSourcingModule_1 = __decorate([
+    (0, common_1.Global)(),
     (0, common_1.Module)({})
 ], EventSourcingModule);
 exports.EventSourcingModule = EventSourcingModule;

@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+
 import { BaseEvent } from '../events/base.event';
 
 export class Event {

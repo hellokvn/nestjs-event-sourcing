@@ -1,14 +1,14 @@
 import { Injectable, Inject } from '@nestjs/common';
 
 import { ExtendedAggregateRoot } from './aggregate';
+import { BaseEvent } from './events';
+import { Type } from './helpers';
 import { EventSourcingService } from './event-sourcing.service';
-import { BaseEvent } from './events/base.event';
-import { Type } from './helpers/utils.helper';
 
 @Injectable()
 export class EventSourcingHandler<T extends ExtendedAggregateRoot> {
   @Inject(EventSourcingService)
-  private eventStoreService: EventSourcingService<T>;
+  private readonly eventStoreService: EventSourcingService<T>;
 
   public async save(aggregate: T): Promise<void> {
     await this.eventStoreService.saveEvents(aggregate);

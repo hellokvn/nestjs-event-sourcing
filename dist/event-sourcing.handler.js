@@ -8,25 +8,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventSourcingHandler = void 0;
 const common_1 = require("@nestjs/common");
-const event_store_service_1 = require("./event-store.service");
+const event_sourcing_service_1 = require("./event-sourcing.service");
 let EventSourcingHandler = class EventSourcingHandler {
-    constructor(eventStoreService) {
-        this.eventStoreService = eventStoreService;
-    }
     async save(aggregate) {
-        console.log('AccountEventSourcingHandler/save');
         await this.eventStoreService.saveEvents(aggregate);
     }
     async getById(aggregateClass, id) {
-        console.log('AccountEventSourcingHandler/getById');
         const aggregate = new aggregateClass();
         const events = await this.eventStoreService.getEvents(id);
+        if (!events || !events.length) {
+            return aggregate;
+        }
         if (events && events.length) {
             aggregate.loadFromHistory(events);
             aggregate.version = this.getLatestVersion(events);
@@ -37,10 +32,12 @@ let EventSourcingHandler = class EventSourcingHandler {
         return events.reduce((a, b) => (a.version > b.version ? a : b)).version;
     }
 };
+__decorate([
+    (0, common_1.Inject)(event_sourcing_service_1.EventSourcingService),
+    __metadata("design:type", event_sourcing_service_1.EventSourcingService)
+], EventSourcingHandler.prototype, "eventStoreService", void 0);
 EventSourcingHandler = __decorate([
-    (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)(event_store_service_1.EventStoreService)),
-    __metadata("design:paramtypes", [event_store_service_1.EventStoreService])
+    (0, common_1.Injectable)()
 ], EventSourcingHandler);
 exports.EventSourcingHandler = EventSourcingHandler;
 //# sourceMappingURL=event-sourcing.handler.js.map

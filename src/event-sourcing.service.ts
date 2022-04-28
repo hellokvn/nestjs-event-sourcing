@@ -10,7 +10,7 @@ import { ExtendedAggregateRoot } from './aggregate/extended.aggregator';
 @Injectable()
 export class EventSourcingService<T extends ExtendedAggregateRoot> implements OnModuleInit, OnModuleDestroy {
   private mongoClient: mongoDB.MongoClient;
-  private eventStoreCollection: mongoDB.Collection<any>;
+  private eventStoreCollection: mongoDB.Collection<Event>;
 
   constructor(@Inject(EVENT_SOURCING_MODULE_OPTIONS) private readonly options: EventSourcingModuleOptions) {}
 

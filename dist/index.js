@@ -15,13 +15,10 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./event-sourcing.module"), exports);
-__exportStar(require("./event-store.service"), exports);
-__exportStar(require("./eventsourcing.options"), exports);
 __exportStar(require("./event-sourcing.handler"), exports);
-__exportStar(require("./schemas/event-store.schema"), exports);
-__exportStar(require("./infrastructure/event-store.interface"), exports);
-__exportStar(require("./handlers/event-sourcing.handler"), exports);
-__exportStar(require("./events/base.event"), exports);
-__exportStar(require("./command/base.command"), exports);
-__exportStar(require("./aggregator/extended.aggregator"), exports);
+__exportStar(require("./event-sourcing.service"), exports);
+__exportStar(require("./event-sourcing.decorator"), exports);
+__exportStar(require("./aggregate"), exports);
+__exportStar(require("./events"), exports);
+__exportStar(require("./models"), exports);
 //# sourceMappingURL=index.js.map

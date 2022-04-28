@@ -36,3 +36,4 @@ lerna-debug.log*
 .history
 .history/*
 node_modules
+dist
