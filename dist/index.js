@@ -19,6 +19,7 @@ __exportStar(require("./event-sourcing.handler"), exports);
 __exportStar(require("./event-sourcing.service"), exports);
 __exportStar(require("./event-sourcing.decorator"), exports);
 __exportStar(require("./aggregate"), exports);
+__exportStar(require("./commands"), exports);
 __exportStar(require("./events"), exports);
 __exportStar(require("./models"), exports);
 //# sourceMappingURL=index.js.map
